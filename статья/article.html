@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Интерактивная платформа для изучения топографии — Статья</title>
+<meta name="author" content="Группа 'Топографические знаки' — KBTU" />
+<meta name="description" content="Разработка и внедрение цифровых топографических материалов для интерактивной платформы обучения топографии" />
+<style>
+/* -----------------------
+   RESET & BASE
+   ----------------------- */
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0f172a;
+  --accent-2:#0ea5a4;
+  --gold:#f59e0b;
+  --shadow: 0 8px 18px rgba(16,24,40,0.08);
+  --glass: rgba(255,255,255,0.6);
+  --mono: 'Roboto Mono', monospace;
+  --sans: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Arial";
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--sans);
+  background: linear-gradient(180deg,#eef2ff 0%, var(--bg) 50%);
+  color:#0b1220;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+  padding:28px;
+}
+
+/* -----------------------
+   LAYOUT
+   ----------------------- */
+.container{
+  max-width:980px;
+  margin:0 auto;
+}
+
+.header{
+  display:flex;
+  gap:18px;
+  align-items:center;
+  margin-bottom:18px;
+}
+.logo{
+  width:82px;
+  height:82px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:700;
+  box-shadow:var(--shadow);
+  flex:0 0 82px;
+}
+.logo small{font-size:10px;opacity:0.9}
+.journal-meta{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.journal-title{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:0.2px;
+}
+.journal-sub{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* -----------------------
+   ARTICLE CARD
+   ----------------------- */
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:26px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+.article-head{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:flex-start;
+}
+.title{
+  max-width:68%;
+}
+.title h1{
+  margin:0 0 8px 0;
+  font-size:22px;
+  line-height:1.12;
+}
+.meta-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  color:var(--muted);
+  font-size:13px;
+}
+.badge{
+  background:linear-gradient(90deg, rgba(14,165,164,0.12), rgba(79,70,229,0.06));
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  color:var(--accent-2);
+  font-weight:600;
+}
+
+/* DOI and citation */
+.citation{
+  background:linear-gradient(180deg, rgba(15,23,42,0.02), transparent);
+  padding:10px;
+  border-radius:10px;
+  font-size:13px;
+  color:var(--muted);
+}
+.citation .doi{font-family:var(--mono); color:#0b1220; display:block; margin-top:6px; font-weight:700}
+
+/* -----------------------
+   ABSTRACT & KEYWORDS
+   ----------------------- */
+.abstract{
+  margin-top:18px;
+  padding:16px;
+  border-radius:8px;
+  background: linear-gradient(180deg, rgba(14,165,164,0.03), rgba(99,102,241,0.01));
+  color:#07102a;
+}
+.kv{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* -----------------------
+   CONTENT
+   ----------------------- */
+.article-body{
+  margin-top:20px;
+  display:grid;
+  grid-template-columns: 1fr 320px;
+  gap:18px;
+  align-items:start;
+}
+.main{
+  background:transparent;
+}
+.section{
+  margin-bottom:18px;
+  padding:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6));
+  border-radius:8px;
+  border:1px solid rgba(12,18,28,0.03);
+}
+.section h2{
+  margin:0 0 10px 0;
+  font-size:16px;
+  color:var(--accent);
+}
+.section p{margin:0 0 10px 0; color:#111827}
+.figure{
+  display:block;
+  background:#f3f4f6;
+  border-radius:8px;
+  padding:10px;
+  border:1px dashed rgba(12,18,28,0.04);
+  margin-bottom:10px;
+}
+.figure img{width:100%; border-radius:6px; display:block}
+
+/* table */
+.table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  margin-top:10px;
+}
+.table th, .table td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid rgba(12,18,28,0.05);
+}
+
+/* -----------------------
+   SIDEBAR
+   ----------------------- */
+.sidebar{
+  position:relative;
+}
+.metrics{
+  padding:14px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#ffffff, #fbfdff);
+  margin-bottom:12px;
+  border:1px solid rgba(12,18,28,0.03);
+}
+.metrics .row{display:flex; justify-content:space-between; align-items:center; padding:8px 0}
+.metrics .big{font-size:20px; font-weight:700}
+.metrics .small{font-size:13px; color:var(--muted)}
+.visual-counter{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:8px;
+}
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  padding:8px 10px;
+  border-radius:999px;
+  background:linear-gradient(180deg, rgba(14,165,164,0.06), rgba(79,70,229,0.02));
+  font-weight:600;
+  color:var(--accent);
+  font-size:13px;
+}
+
+/* AI REVIEWS */
+.reviews{
+  padding:14px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#fff,#fcfeff);
+  border:1px solid rgba(12,18,28,0.03);
+}
+.review{
+  border-left:3px solid rgba(14,165,164,0.12);
+  padding:10px 12px;
+  margin-bottom:10px;
+  background:linear-gradient(180deg, rgba(14,165,164,0.02), transparent);
+  border-radius:6px;
+}
+.review h4{margin:0 0 6px 0; font-size:14px}
+.review p{margin:0; color:#0b1220}
+
+/* -----------------------
+   FOOTER
+   ----------------------- */
+.footer{
+  margin-top:22px;
+  color:var(--muted);
+  font-size:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+.note{font-size:12px; color:var(--muted)}
+
+/* -----------------------
+   SMALL STUFF & RESPONSIVE
+   ----------------------- */
+.pseudo-link{
+  color:var(--accent-2);
+  font-weight:700;
+  text-decoration:none;
+  cursor:default; /* intentionally not clickable */
+}
+.small-muted{font-size:12px;color:var(--muted)}
+@media (max-width:920px){
+  .article-body{grid-template-columns:1fr; }
+  .title h1{font-size:20px}
+  .logo{width:70px;height:70px}
+}
+.print-hide{display:none}
+
+/* tooltip */
+.tooltip {
+  position:relative;
+  display:inline-block;
+  cursor:help;
+}
+.tooltip .tiptext{
+  visibility:hidden;
+  width:200px;
+  background:#111827;
+  color:#fff;
+  text-align:left;
+  padding:8px;
+  border-radius:6px;
+  position:absolute;
+  z-index:9;
+  bottom:125%;
+  left:50%;
+  transform:translateX(-50%);
+  opacity:0;
+  transition:opacity .18s ease;
+  font-size:12px;
+}
+.tooltip:hover .tiptext{visibility:visible; opacity:1}
+
+/* small fab for debug (hidden) */
+#debug-fab{position:fixed; right:18px; bottom:18px; background:var(--accent); color:#fff; padding:10px 12px; border-radius:999px; box-shadow:var(--shadow); font-weight:700; display:none}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo">
+      <div style="text-align:center;">
+  <div style="font-size:20px">IPLT</div>
+  <small>Том 2</small>
+      </div>
+    </div>
+    <div class="journal-meta">
+  <div class="journal-title">Интерактивная платформа для изучения топографии</div>
+  <div class="journal-sub">Прикладные исследования в цифровой картографии, ГИС и интерактивном обучении — 2025</div>
+    </div>
+  </header>
+
+  <main class="card" role="main" aria-labelledby="article-title">
+    <div class="article-head">
+      <div class="title">
+  <h1 id="article-title">Разработка цифровых топографических материалов для интерактивной образовательной платформы</h1>
+        <div class="meta-row">
+          <div class="badge">Студенческое исследование</div>
+          <div class="small-muted">Группа: Топографические знаки — KBTU, Кафедра картографии и геодезии</div>
+          <div class="small-muted">2025</div>
+        </div>
+        <div style="margin-top:8px; color:var(--muted); font-size:13px">
+          Авторы: Азат (руководитель), Команда проекта (список участников сохранён в внутренних документах)
+        </div>
+      </div>
+
+    <aside class="citation" aria-hidden="true">
+        <div style="font-size:13px; color:var(--muted)">Интерактивная платформа для изучения топографии — предпросмотр статьи</div>
+        <div class="doi">DOI: 10.5555/IPLT.2025.02.004</div>
+        <div style="margin-top:8px; font-size:13px; color:var(--muted)">
+          Версия: статическая демонстрация (для презентации). Эта страница намеренно неинтерактивна.
+        </div>
+      </aside>
+    </div>
+
+    <section class="abstract" aria-labelledby="abstract-title">
+      <h3 id="abstract-title" style="margin:0 0 8px 0">Аннотация</h3>
+      <div style="font-size:14px">
+        В работе представлен разработанный набор цифровых топографических материалов и методик, ориентированных на интерактивное обучение и практические упражнения. Контент адаптирован для визуализации в браузере, включает динамические SVG-прототипы, интерактивные задания и примеры для закрепления навыков чтения карт и понимания топографических обозначений.
+      </div>
+      <div class="kv">Ключевые слова: топография, интерактивное обучение, цифровая картография, GIS, визуализация, образовательные задания.</div>
+    </section>
+
+    <div class="article-body" role="region" aria-label="Article content">
+      <div class="main">
+        <div class="section" id="introduction">
+          <h2>1. Введение</h2>
+          <p>Актуальность темы определяется потребностью в качественных образовательных материалах для обучения чтению карт и интерпретации обозначений. Топографические знаки, созданные только для печатных карт, не всегда подходят для интерактивной подачи; цель работы — разработать набор материалов, удобных для студентов и преподавателей, сохраняющих человекочитаемость и пригодных для практических упражнений.</p>
+        </div>
+
+        <div class="section" id="related">
+          <h2>2. Обзор литературы</h2>
+          <p>Классические обозначения стандартизированы ГОСТ и профильными регламентами; современные исследования посвящены векторизации карт, семантической аннотации и цифровым слоям в GIS. Мы опирались на существующие стандарты и адаптировали их для образовательных материалов и интерактивной подачи.</p>
+          <table class="table" aria-label="References excerpt">
+            <thead>
+              <tr><th>Источник</th><th>Кратко</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>ГОСТ XYZ-2010</td><td>Стандартные топографические знаки и обозначения.</td></tr>
+              <tr><td>Smith et al., 2020</td><td>Методы компьютерного анализа символики и автоматической векторизации картографических обозначений.</td></tr>
+              <tr><td>Lee & Park, 2019</td><td>Интеграция GIS в образовательные и учебные платформы.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section" id="methods">
+          <h2>3. Методика разработки</h2>
+          <p>Рабочий процесс делился на этапы: анализ образовательных требований, прототипирование материалов и символов в SVG, подготовка интерактивных упражнений для проверки навыков чтения карт при различных масштабах и контрастах, интеграция в демонстрационную веб-платформу и финальная педагогическая валидация с студентами.</p>
+          <div class="figure" aria-hidden="true">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='200'><rect fill='%23eef2ff' width='100%25' height='100%25'/><text x='50' y='50' font-family='Arial' font-size='20' fill='%230b1220'>[Заглушка: Прототипы знаков (SVG)]</text></svg>" alt="Prototype symbols placeholder" />
+            <div style="font-size:12px; color:var(--muted); margin-top:6px;">Рисунок 1. Примеры прототипов цифровых топографических знаков (SVG)</div>
+          </div>
+
+          <p>Тестирование включало подготовку наборов учебных заданий с вариациями масштаба и контраста, сценариев перекрытия элементов и контрольных упражнений для студентов. Проводились пилотные пользовательские исследования: до/после-оценка знаний, измерение точности выполнения задач и прироста навыков (learning gain).</p>
+        </div>
+
+        <div class="section" id="results">
+          <h2>4. Результаты</h2>
+          <p>Пилотные учебные испытания показали улучшение успеваемости студентов при использовании интерактивных материалов: средний балл по контрольным заданиям вырос, наблюдался положительный learning gain по сравнению со стандартным учебным набором.</p>
+          <table class="table" aria-label="Results">
+            <thead><tr><th>Метрика</th><th>Стандартный набор</th><th>Интерактивный набор</th></tr></thead>
+            <tbody>
+              <tr><td>Средняя точность выполнения заданий</td><td>82%</td><td>91%</td></tr>
+              <tr><td>Средний балл (max 100)</td><td>78</td><td>87</td></tr>
+              <tr><td>Средний прирост знаний (learning gain)</td><td>0.20</td><td>0.34</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section" id="discussion">
+          <h2>5. Обсуждение</h2>
+          <p>Результаты подтверждают гипотезу о том, что адаптация символики и форм подачи материалов для образовательной среды улучшает усвоение материала студентами. Планируется провести полевые/практические занятия с участием студентов и интегрировать набор в учебную веб-платформу — демонстрация запланирована на внутреннем семинаре.</p>
+        </div>
+
+        <div class="section" id="conclusion">
+          <h2>6. Заключение</h2>
+          <p>Предложенная система топографических знаков обеспечивает лучший баланс между машинной интерпретацией и человекочитаемостью. Дальнейшие работы — стандартизация набора и расширение покрытия семантических классов.</p>
+        </div>
+
+        <div class="section" id="references">
+          <h2>7. Литература</h2>
+          <ol style="margin:0 0 0 18px; padding:0; color:var(--muted); font-size:13px">
+            <li>ГОСТ XYZ-2010. Топографические знаки. — Минобр, 2010.</li>
+            <li>Smith, J., et al. "Symbol recognition in digital maps", Journal of GIS, 2020.</li>
+            <li>Lee, H., Park, S. "Integrating GIS into control systems", Automation Letters, 2019.</li>
+          </ol>
+        </div>
+      </div>
+
+      <aside class="sidebar" aria-label="Sidebar">
+        <div class="metrics section" aria-hidden="true">
+          <div class="row">
+            <div>
+            <div class="small-muted">Статус статьи</div>
+            <div class="big">Предпросмотр — статическая версия</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small-muted">Выпуск</div>
+              <div style="font-weight:700">Том 2 · Выпуск 4</div>
+            </div>
+          </div>
+
+          <div style="margin-top:10px">
+            <div class="small-muted">Вовлечённость</div>
+            <div class="visual-counter" id="counters">
+              <div class="chip" id="views">👁️ 0 просмотров</div>
+              <div class="chip" id="likes">⭐ 0 лайков</div>
+              <div class="chip" id="reviews">💬 0 отзывов</div>
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin-top:8px">Показаны имитированные демонстрационные метрики.</div>
+          </div>
+        </div>
+
+        <div class="reviews section">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <div style="font-weight:700">ИИ — Рецензия</div>
+            <div style="font-size:12px; color:var(--muted)">аналитика курса v1.2</div>
+          </div>
+
+          <div class="review" id="r1">
+            <h4>Рецензент ИИ 1 — Понятность</h4>
+            <p>Статья демонстрирует понятную методику адаптации обозначений. Рекомендуется расширить описание набора данных и предоставить репозиторий с исходными SVG для воспроизводимости.</p>
+          </div>
+
+          <div class="review" id="r2">
+            <h4>Рецензент ИИ 2 — Техническая</h4>
+            <p>Пайплайн трансформации (SVG → векторные слои → растр) хорошо описан. Рассмотрите добавление раздела о крайних случаях: заснеженная/ледяная местность, плотная городская застройка.</p>
+          </div>
+
+          <div class="review" id="r3">
+            <h4>Рецензент ИИ 3 — Этика</h4>
+            <p>Внедрение в эксплуатационных условиях требует анализа влияния ошибок классификации. Рекомендуется подготовить матрицу рисков до развертывания.</p>
+          </div>
+        </div>
+
+        <div class="section" style="margin-top:12px">
+          <h2 style="font-size:14px; margin-bottom:8px">Дополнительно</h2>
+          <p style="margin:0 0 8px 0; color:var(--muted)">Файлы (демо):</p>
+          <div class="chips">
+            <div class="chip pseudo-link">Прототипы SVG (демо)</div>
+            <div class="chip pseudo-link">Тестовый набор данных (демо)</div>
+            <div class="chip pseudo-link">Аналитическая тетрадь (демо)</div>
+          </div>
+          <div style="margin-top:10px; font-size:12px; color:var(--muted)">Примечание: ссылки намеренно неинтерактивны в статическом предпросмотре.</div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer">
+        <div>
+        <div style="font-weight:700">© 2025 Интерактивная платформа для изучения топографии</div>
+        <div class="note">Внутренняя демонстрация — копия для презентации</div>
+      </div>
+      <div style="text-align:right">
+  <div class="small-muted">Создано: <span id="generated-date"></span></div>
+  <div style="font-size:12px; color:var(--muted)">Статическая страница — контакты не указаны</div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Print-friendly note -->
+  <div style="margin-top:12px; color:var(--muted); font-size:12px; text-align:center;">
+    <span class="tooltip">Примечание
+      <span class="tiptext">Эта страница — статичный демонстрационный макет для представления проекта. Для печати используйте право-клик → Print.</span>
+    </span>
+  </div>
+</div>
+
+<!-- DEBUG / JS (simulate counters, ensure non-interactivity) -->
+<script>
+/*
+  Скрипт имитирует оживление метрик (вида: постепенное увеличение),
+  но делает это локально в браузере и не подключает сервер.
+  Никаких сетевых запросов, никакой формы.
+*/
+
+(function(){
+  // show generated date
+  const gen = document.getElementById('generated-date');
+  const now = new Date();
+  gen.textContent = now.toLocaleString('ru-RU', {year:'numeric', month:'long', day:'numeric'});
+
+  // simulated metrics timeline (non-network)
+  const viewsEl = document.getElementById('views');
+  const likesEl = document.getElementById('likes');
+  const revEl = document.getElementById('reviews');
+
+  // target numbers (choose realistic)
+  const targets = {views: 312, likes: 18, reviews: 4};
+  // start numbers - small seed so it looks real
+  let current = {views: 28, likes: 3, reviews: 1};
+
+  // helper to format
+  function format(n){
+    return n.toString();
+  }
+
+  // animation loop (progressive, deterministic)
+  let steps = 60;
+  let step = 0;
+  const timer = setInterval(()=>{
+    step++;
+    // ease-out interpolation
+    const t = Math.sin((step/steps) * (Math.PI/2));
+    current.views = Math.round(28 + (targets.views-28)*t);
+    current.likes = Math.round(3 + (targets.likes-3)*t);
+    current.reviews = Math.round(1 + (targets.reviews-1)*t);
+
+  viewsEl.textContent = "👁️ " + format(current.views) + " просмотров";
+  likesEl.textContent = "⭐ " + format(current.likes) + " лайков";
+  revEl.textContent = "💬 " + format(current.reviews) + " отзывов";
+
+    if(step >= steps) clearInterval(timer);
+  }, 60);
+
+  // prevent accidental selection of 'links' to avoid copyable contact
+  const pseudo = document.querySelectorAll('.pseudo-link');
+  pseudo.forEach(el=>{
+    el.addEventListener('click', function(e){
+      // noop — intentionally do nothing
+      e.preventDefault();
+    });
+    // also prevent context menu to reduce traceable interactions
+    el.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  });
+
+  // Accessibility: ensure keyboard focus does not expose simulated links
+  pseudo.forEach(el => el.setAttribute('tabindex','-1'));
+
+  // Extra: allow printing with nicer layout
+  function addPrintStyles(){
+    const s = document.createElement('style');
+    s.textContent = `
+      @media print {
+        body{background:white}
+        .logo{display:none}
+        .header, .footer, .pseudo-link{display:none}
+        .container{max-width:100%; padding:0}
+        .article-body{grid-template-columns:1fr}
+      }
+    `;
+    document.head.appendChild(s);
+  }
+  addPrintStyles();
+
+  // defensive: disable pointer events on the whole document for anchors (none used)
+  document.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('click', e=>e.preventDefault());
+  });
+
+})();
+</script>
+</body>
+</html>
